@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Tue Aug  6 20:11:42 2019
+
+@author: chaeg
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Tue Jul  9 20:41:59 2019
 
 @author: chaeg
@@ -31,7 +38,7 @@ headers = {
 
 API_KEY = str(input("What is your API KEY?"))
 
-url = 'https://www.zoopla.co.uk/to-rent/property/5-bedrooms/london/?furnished_state=furnished&price_frequency=per_month&price_max=4000&price_min=3000&q=London&radius=0&results_sort=newest_listings&search_source=refine'
+url = 'https://www.zoopla.co.uk/to-rent/property/london/?beds_min=4&furnished_state=furnished&price_frequency=per_month&price_max=3250&price_min=2500&q=London&results_sort=newest_listings&search_source=home'
 web_page = requests.get(url,headers = headers)
 html_content = web_page.text
 soup = BS(html_content, 'html.parser')
@@ -63,30 +70,30 @@ Ellie_add = str(input("what is the first work address?: ")).replace(" ","+")
 Kate_add = str(input("what is the second work address?: ")).replace(" ","+")
 Celia_add = str(input("what is the third work address?: ")).replace(" ","+")
 Catriona_add = str(input("what is the fourth address?: ")).replace(" ","+")
-Connie_add = str(input("what is the fifth work address?: ")).replace(" ","+")
 Chae_add = str(input("what is the sixth work address?: ")).replace(" ","+")
 """
 
-#addresses for TESTING!
 
 Ellie_add = "Cockspur+Street,London,SW1"
 Kate_add = "69+chepstow+road,W2+5QR"
 Celia_add = "3+Primrose+Mews,NW1+8YW"
 Catriona_add = "Northampton+Square,Clerkenwell,London,EC1V+0HB"
-Connie_add = "2+Marsham+St,Westminster,London,SW1P+4DF"
 Chae_add ="1+Fore+St+Ave,London+EC2Y+5EJ"
 
 
-url_loop = "https://www.zoopla.co.uk/to-rent/property/5-bedrooms/london/?beds_min=5&price_max=4250&identifier=london&furnished_state=furnished&price_min=2500&q=London&beds_max=5&search_source=refine&radius=0&price_frequency=per_month&pn="
+url_loop = "https://www.zoopla.co.uk/to-rent/property/london/?beds_min=4&price_max=3250&identifier=london&furnished_state=furnished&price_min=2500&q=London&search_source=home&radius=0&price_frequency=per_month&pn="
 
 #want it to have range for itself
 #CURRENTLY adjust range from checking Zoopla to see how many pages there are
+#don't think it matters if range> actual number of pages
+#therefore leave as 34 as wouldn't want more than that anyway
 
-for page in range(2,7):
+for page in range(2,34):
     url_get = url_loop + str(page)
     web_page_loop = requests.get(url_get,headers = headers)
     soup_loop = BS(web_page_loop.text,'html.parser')
     time.sleep(2*np.random.rand())
+    print("page " + str(page) +" done")
     for a in soup_loop.find_all('a',{"class":"listing-results-price text-price"},href=True):
         actual_url = "https://www.zoopla.co.uk" + str(a['href'])
         url_list.append(actual_url)
@@ -100,7 +107,7 @@ for page in range(2,7):
     
 
 def Celia_Commute(location):
-    url_dir = "https://maps.googleapis.com/maps/api/directions/json?origin=" + str(location) + "&destination=" + str(Celia_add) + "&mode=transit&key="+API_KEY
+    url_dir = "https://maps.googleapis.com/maps/api/directions/json?origin=" + str(location) + "&destination=" + str(Celia_add) + "&mode=transit&departure_time=1565078400&key="+API_KEY
     json_dir = requests.get(url_dir,headers = headers)
     dir_dict = json_dir.json()
     #print(dir_dict["status"])
@@ -114,7 +121,7 @@ def Celia_Commute(location):
     return travel_time, status
 
 def Catriona_Commute(location):
-    url_dir = "https://maps.googleapis.com/maps/api/directions/json?origin=" + str(location) + "&destination=" + str(Catriona_add) + "&mode=transit&key="+API_KEY
+    url_dir = "https://maps.googleapis.com/maps/api/directions/json?origin=" + str(location) + "&destination=" + str(Catriona_add) + "&mode=transit&departure_time=1565078400&key="+API_KEY
     json_dir = requests.get(url_dir,headers = headers)
     dir_dict = json_dir.json()
     routes = dir_dict["routes"]
@@ -126,23 +133,9 @@ def Catriona_Commute(location):
     status = dir_dict["status"]
     return travel_time, status
 
-def Connie_Commute(location):
-    url_dir = "https://maps.googleapis.com/maps/api/directions/json?origin=" + str(location) + "&destination=" + str(Connie_add) + "&mode=transit&key="+API_KEY
-    json_dir = requests.get(url_dir,headers = headers)
-    dir_dict = json_dir.json()
-    routes = dir_dict["routes"]
-    routes_dict  = routes[0]
-    legs = routes_dict["legs"]
-    legs_dict = legs[0]
-    duration = legs_dict["duration"]
-    travel_time = duration["value"] #in seconds
-    status = dir_dict["status"]
-    #print("result: "+travel_time)
-    #print("error: "+error)
-    return travel_time, status
 
 def Ellie_Commute(location):
-    url_dir = "https://maps.googleapis.com/maps/api/directions/json?origin=" + str(location) + "&destination=" + str(Ellie_add) + "&mode=transit&key="+API_KEY
+    url_dir = "https://maps.googleapis.com/maps/api/directions/json?origin=" + str(location) + "&destination=" + str(Ellie_add) + "&mode=transit&departure_time=1565078400&key="+API_KEY
     json_dir = requests.get(url_dir,headers = headers)
     dir_dict = json_dir.json()
     routes = dir_dict["routes"]
@@ -155,7 +148,7 @@ def Ellie_Commute(location):
     return travel_time, status
 
 def Kate_Commute(location):
-    url_dir = "https://maps.googleapis.com/maps/api/directions/json?origin=" + str(location) + "&destination=" + str(Kate_add) + "&mode=transit&key="+API_KEY
+    url_dir = "https://maps.googleapis.com/maps/api/directions/json?origin=" + str(location) + "&destination=" + str(Kate_add) + "&mode=transit&departure_time=1565078400&key="+API_KEY
     json_dir = requests.get(url_dir,headers = headers)
     dir_dict = json_dir.json()
     routes = dir_dict["routes"]
@@ -168,7 +161,7 @@ def Kate_Commute(location):
     return travel_time, status
 
 def Chae_Commute(location):
-    url_dir = "https://maps.googleapis.com/maps/api/directions/json?origin=" + str(location) + "&destination=" + str(Chae_add) + "&mode=transit&key="+API_KEY
+    url_dir = "https://maps.googleapis.com/maps/api/directions/json?origin=" + str(location) + "&destination=" + str(Chae_add) + "&mode=transit&departure_time=1565078400&key="+API_KEY
     json_dir = requests.get(url_dir,headers = headers)
     dir_dict = json_dir.json()
     routes = dir_dict["routes"]
@@ -187,38 +180,36 @@ celia_time = []
 ellie_time = []
 kate_time = []
 catriona_time = []
-connie_time = []
 chae_time = []
 commute_time = []
 std_dev=[]
 
-#Vectorise last two operations
 
 for i in location:
+        time.sleep(0.1)
         celia_time.append(Celia_Commute(i)[0])
-        time.sleep(2*np.random.rand())
+        time.sleep(0.1)
         ellie_time.append(Ellie_Commute(i)[0])
-        time.sleep(np.random.rand())
+        time.sleep(0.1)
         catriona_time.append(Catriona_Commute(i)[0])
-        time.sleep(2*np.random.rand())
-        connie_time.append(Connie_Commute(i)[0])
-        time.sleep(np.random.rand())
+        time.sleep(0.1)
         chae_time.append(Chae_Commute(i)[0])
-        time.sleep(2*np.random.rand())
+        time.sleep(0.1)
         kate_time.append(Kate_Commute(i)[0])
+        time.sleep(0.1)
         #A = Celia_Commute(i)[0]
         #B = Ellie_Commute(i)[0]
         #C = Catriona_Commute(i)[0]
-        #D = Connie_Commute(i)[0]
         #E = Chae_Commute(i)[0]
         #F = Kate_Commute(i)[0]
-        #commute_time.append(A+B+C+D+E+F)
-        #std_dev.append(np.std([A,B,C,D,E,F]))
+        #commute_time.append(A+B+C+E+F)
+        #std_dev.append(np.std([A,B,C,E,F]))
 
-#TESTING RUN 1 PAGE
-
-commute_time = np.array(celia_time) + np.array(ellie_time) + np.array(kate_time) + np.array(catriona_time) + np.array(chae_time) + np.array(connie_time)
-std_dev = np.std([celia_time,ellie_time,kate_time,catriona_time,chae_time,connie_time], axis = 0)
+#vectorising some elements of above loop
+        
+commute_time = np.array(celia_time) + np.array(ellie_time) + np.array(kate_time) + np.array(catriona_time) + np.array(chae_time)
+std_dev = np.std([celia_time,ellie_time,kate_time,catriona_time,chae_time], axis = 0)#inseconds
+std_dev = np.array(std_dev)/60.0 # in minutes
         
 commute_seconds = commute_time
 commute_time = (np.array(commute_time,dtype=float)/60)#in minutes
@@ -227,22 +218,22 @@ celia_time = (np.array(celia_time,dtype=float)/60)#in minutes
 chae_time = (np.array(chae_time,dtype=float)/60)#in minutes
 catriona_time = (np.array(catriona_time,dtype=float)/60)#in minutes
 ellie_time = (np.array(ellie_time,dtype=float)/60)#in minutes
-connie_time = (np.array(connie_time,dtype=float)/60)#in minutes
 avg_commute_time = commute_time/6
 avg_commute_time = avg_commute_time.tolist()
 commute_time = commute_time.tolist()
 
-#better practice to rescale to 30*60 and 800 for example
+
 score = (np.array(commute_seconds)/max(commute_seconds)) + (np.array(price)/max(price)) + 2*(np.array(std_dev)/max(std_dev))
 score = score.tolist()
 
 
-d = {'location': location, 'price': price,'webpage': url_list ,'avg_commute_time': avg_commute_time,'std_dev': std_dev,'score': score,'Kate_time':kate_time,'Catriona_time':catriona_time,'Chae_time':chae_time,'Celia_time':celia_time,'Connie_time':connie_time,'Ellie_time':ellie_time}
+d = {'location': location, 'price': price,'webpage': url_list ,'avg_commute_time': avg_commute_time,'std_dev': std_dev,'score': score,'Kate_time':kate_time,'Catriona_time':catriona_time,'Chae_time':chae_time,'Celia_time':celia_time,'Ellie_time':ellie_time}
 df = pd.DataFrame(data=d)
 
 #this isnt saved to memory
 df_sort = df.sort_values('score', ascending = True)
 
-df_sort.to_excel("house_hunt.xlsx")
+df_sort.to_excel("4_bed_house_hunt.xlsx")
+
 
 print("SCRAPING DONE")
